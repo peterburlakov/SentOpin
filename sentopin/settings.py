@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'sentopin',
     'baton',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'reviews',
     'baton.autodiscover'
 ]
 
@@ -128,12 +130,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 BATON = {
-    'SITE_HEADER': 'Baton',
+    'SITE_HEADER': 'SentOpin',
     'SITE_TITLE': 'Baton',
-    'INDEX_TITLE': 'Site administration',
-    'SUPPORT_HREF': 'https://github.com/otto-torino/django-baton/issues',
-    'COPYRIGHT': 'copyright © 2020 <a href="https://www.otto.to.it">Otto srl</a>', # noqa
-    'POWERED_BY': '<a href="https://www.otto.to.it">Otto srl</a>',
+    'INDEX_TITLE': 'SentOpin',
     'CONFIRM_UNSAVED_CHANGES': True,
     'SHOW_MULTIPART_UPLOADING': True,
     'ENABLE_IMAGES_PREVIEW': True,
@@ -150,29 +149,35 @@ BATON = {
         'url': '/search/',
     },
     'MENU': (
-        { 'type': 'title', 'label': 'main', 'apps': ('auth', ) },
         {
-            'type': 'app',
-            'name': 'auth',
-            'label': 'Authentication',
-            'icon': 'fa fa-lock',
-            'models': (
+            'type': 'title',
+            'label': 'Navigation',
+            'apps': ('reviews', ),
+            'default_open': True,
+            'children': [
                 {
-                    'name': 'user',
-                    'label': 'Users'
+                    'type': 'model',
+                    'label': 'New Search',
+                    'name': 'search',
+                    'app': 'reviews'
                 },
                 {
-                    'name': 'group',
-                    'label': 'Groups'
+                    'type': 'model',
+                    'label': 'Places',
+                    'name': 'places',
+                    'app': 'reviews'
                 },
-            )
+                {
+                    'type': 'model',
+                    'label': 'Reviews',
+                    'name': 'review',
+                    'app': 'reviews'
+                },
+                
+            ]
         },
-        { 'type': 'title', 'label': 'Contents', 'apps': ('flatpages', ) },
-        { 'type': 'model', 'label': 'Pages', 'name': 'flatpage', 'app': 'flatpages' },
-        { 'type': 'free', 'label': 'Custom Link', 'url': 'http://www.google.it', 'perms': ('flatpages.add_flatpage', 'auth.change_user') },
-        { 'type': 'free', 'label': 'My parent voice', 'default_open': True, 'children': [
-            { 'type': 'model', 'label': 'A Model', 'name': 'mymodelname', 'app': 'myapp' },
-            { 'type': 'free', 'label': 'Another custom link', 'url': 'http://www.google.it' },
-        ] },
+        
+       
+      
     ),
 }
