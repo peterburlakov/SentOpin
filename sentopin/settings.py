@@ -130,9 +130,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 BATON = {
+    'POWERED_BY': 'EPAM Hackaton Team',
+    'COPYRIGHT': '2021',
     'SITE_HEADER': 'SentOpin',
     'SITE_TITLE': 'Baton',
     'INDEX_TITLE': 'SentOpin',
+    'SUPPORT_HREF': '',
     'CONFIRM_UNSAVED_CHANGES': True,
     'SHOW_MULTIPART_UPLOADING': True,
     'ENABLE_IMAGES_PREVIEW': True,
@@ -173,11 +176,11 @@ BATON = {
                     'name': 'review',
                     'app': 'reviews'
                 },
-                
+
             ]
         },
-        
-       
-      
+
+
+
     ),
 }
