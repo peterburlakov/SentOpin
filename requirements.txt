@@ -1,3 +1,4 @@
 django
 django-baton
 plotly
+django_plotly_dash
