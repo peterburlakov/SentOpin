@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 #from django_admin_listfilter_dropdown.filters import DropdownFilter
 from baton.admin import InputFilter
+from django.utils.html import format_html
 
 admin.site.unregister(Group)
 admin.site.unregister(User)
@@ -33,7 +34,14 @@ class PlacesAdmin(admin.ModelAdmin):
  
 @admin.register(Search)
 class SearchAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'status' )
+    list_display = ('id', 'text', 'status', 'report' )
+
+    @admin.display(empty_value='???')
+    def report(self, obj):
+         return format_html(
+            f'<a href="http://localhost:8000/reviews/show/{obj.id}">Show</a> '
+        )
+
  
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
