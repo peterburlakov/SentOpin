@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'reviews',
-    'baton.autodiscover'
+    'baton.autodiscover',
 ]
 
 MIDDLEWARE = [

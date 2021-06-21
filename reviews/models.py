@@ -18,6 +18,7 @@ class Search(models.Model):
 
 
 class Places(models.Model):
+    
     search = models.ForeignKey(Search, on_delete=models.CASCADE)
     status = models.IntegerField(choices=Status.choices,
                                  default=Status.PENDING)
