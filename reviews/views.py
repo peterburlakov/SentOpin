@@ -1,40 +1,25 @@
+from pandas.io.formats import style
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd 
-import re
+ 
 import plotly.express as px  # (version 4.7.0)
 import numpy as np
 
 from django_plotly_dash import DjangoDash
 from django.shortcuts import render
-import geopandas as gpd
 from dash.dependencies import Input, Output
 from collections import Counter 
+from .services import DataProvider
+
+data_provider = DataProvider()
 
 app = DjangoDash('SimpleExample')
 
-df = pd.read_csv('~/Downloads/reviews.csv', index_col=0)
-df['entities'] = df.expertai_entities.apply(lambda x: [i for i in re.sub('[\]\"  \[\,]','', x).split("'") if i!=''])
-df['items'] = df['expertai_sentiment.items'].apply(lambda x: [i for i in re.sub('[\]\"  \[\,]','', x).split("'") if i!=''])
-df['phrases'] = df['expertai_mainPhrases'].apply(lambda x: [i for i in re.sub('[\]\"\[\,]','', x).split("'") if i!=''])
-df['lemmas'] = df['expertai_mainLemmas'].apply(lambda x: [i for i in re.sub('[\]\"\[\,]','', x).split("'") if i!=''])
-df['isAgent'] = df.place_name.apply(lambda x: True if 'Agent' in x else False)
-
-states = sorted(np.append(df.place_state.unique().tolist(),'All'))
-
-url = ("https://raw.githubusercontent.com/python-visualization/folium/master/examples/data")
-state_geo = f"{url}/us-states.json"
-
-# We read the file and print it.
-geoJSON_df = gpd.read_file(state_geo)
-geoJSON_df.head()
-df = pd.merge(df, geoJSON_df, left_on='place_state', right_on='name')
-
-
 app.layout = html.Div(id='main', children = [
-
     html.Div([
+        # dcc.Location(id='url', refresh=False),
+        html.Div(id='url_slug', style = {'visibility': 'hidden'}),
         dcc.RadioItems(
                     id='agent_type',
                     options=[{'label':'Agent','value': True}, {'label':'notAgent', 'value': False},
@@ -61,7 +46,6 @@ app.layout = html.Div(id='main', children = [
         html.Br(),
 
         dcc.Graph(id='my_bee_map', figure={})
-
     ])
 ])
 
@@ -70,31 +54,31 @@ app.layout = html.Div(id='main', children = [
     [Output(component_id='output_container', component_property='children'),
      Output(component_id='my_bee_map', component_property='figure')
     ],
-    [Input(component_id='agent_type', component_property='value'),
+    [
+     Input(component_id='url_slug', component_property='children'),
+    Input(component_id='agent_type', component_property='value'),
      Input(component_id='slct_type', component_property='value'),
      Input(component_id='value_type', component_property='value')
     ]
 )
 
 
-def update_graph(agent_type, slct_type, value_type):
-    
+def update_graph(url_slug, agent_type, slct_type, value_type):
     def get_num_items(x, value_to_find:str):
         idx = [index+1 for index, value in enumerate(x) if value == value_to_find]
         return str(dict(Counter(np.array(x)[idx])))
 
-    dff = df.copy()
+    df = data_provider.get_data(url_slug)
     if slct_type != 'overall':
-        dff[slct_type] = dff['expertai_classification'].apply(lambda x: True if slct_type in x else False)
-        dff = dff[dff[slct_type] == True]
-
+        df[slct_type] = df['expertai_classification'].apply(lambda x: True if slct_type in x else False)
+        df = df[df[slct_type] == True]
     
     if agent_type == 'All':
         columns_to_group = ['place_state']
     else:
         columns_to_group = ['place_state', 'isAgent']
     
-    df_grouped = dff\
+    df_grouped = df\
     .groupby(columns_to_group, as_index = False)\
     .agg({
         'items': 'sum', 
@@ -141,19 +125,6 @@ def update_graph(agent_type, slct_type, value_type):
 
 
 def show(request, search_id):
-    return render(request, "dash.html")
-
-
-# from plotly.offline import plot
-# from plotly.graph_objs import Scatter
-
-# # Create your views here.
-# def show(request):
-#     x_data = [0,1,2,3]
-#     y_data = [x**2 for x in x_data]
-#     plot_div = plot([Scatter(x=x_data, y=y_data,
-#                         mode='lines', name='test',
-#                         opacity=0.8, marker_color='green')],
-#                output_type='div',
-#                include_plotlyjs=False)
-#     return render(request, "show.html", context={'plot_div': plot_div})
+    some_dict = {'url_slug': {'children': search_id}}
+    print(some_dict)
+    return render(request, "dash.html", {'some_dict': some_dict})
