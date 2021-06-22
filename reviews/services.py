@@ -23,11 +23,11 @@ class DataProvider():
         data = [{
                 'reviewer': obj.reviewer,
                 'text': obj.text,
-                'entities': flat_lists(obj.expertai_entities) ,
+                'entities': flat_lists(obj.expertai_entities),
                 'items': json.dumps(obj.expertai_sentiment_items).lower(),
                 'phrases': [v[0] for v in obj.expertai_mainPhrases],
                 'lemmas': obj.expertai_mainLemmas,
-                'isAgent': True if 'Agent' in obj.place.name else False,
+                'isAgent': obj.place.is_agent,
                 'place_state': obj.place.state,
                 'expertai_classification': json.dumps(obj.expertai_classification).lower(),
                 'latitude': float(obj.place.lat),

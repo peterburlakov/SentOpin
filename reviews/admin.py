@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.contrib.auth.models import Group, User
 #from django_admin_listfilter_dropdown.filters import DropdownFilter
-from baton.admin import InputFilter
+from baton.admin import InputFilter, RelatedDropdownFilter, DropdownFilter
 from django.utils.html import format_html
 
 admin.site.unregister(Group)
@@ -27,10 +27,13 @@ class NameFilter(InputFilter):
 
 @admin.register(Places)
 class PlacesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'lat', 'lng', 'rating', )
+    list_display = ('id', 'name', 'lat', 'lng', 'rating', 'search')
     list_filters = (
          (NameFilter),
     )
+
+    def search(self, obj):
+        return obj.search.text 
  
 @admin.register(Search)
 class SearchAdmin(admin.ModelAdmin):
@@ -58,4 +61,43 @@ class SearchAdmin(admin.ModelAdmin):
  
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('id', 'url', 'sentiment_overall', )
+    list_display = ('id', 'text', 'sentiment_overall', 'place_name', 'search')
+
+    class IdFilter(InputFilter):
+        parameter_name = 'id'
+        title = 'id'
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                search_term = self.value()
+                return queryset.filter(
+                    id=search_term
+                )
+
+    class ClassificationFilter(InputFilter):
+        parameter_name = 'classification'
+        title = 'classification'
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                search_term = self.value()
+                return queryset.filter(
+                    id=search_term
+                )
+    
+    #list_filters = (
+    #    IdFilter,
+    #)
+
+    list_filter = (
+        # for ordinary fields
+        (IdFilter),
+        (ClassificationFilter),
+         ('place', RelatedDropdownFilter),
+    )
+
+    def place_name(self, obj):
+        return obj.place.name
+
+    def search(self, obj):
+        return obj.place.search.text 

@@ -16,16 +16,10 @@ data_provider = DataProvider()
 
 app = DjangoDash('SentOpinDash')
 
-
-   
-
 app.layout = html.Div(id='main', children = [
     html.Div(id='url_slug', style = {'visibility': 'hidden'}),
     html.Div(id='output_container', children=[]),
     html.Div([
-        html.Div( [
-            dcc.Graph(id='my_bee_map', figure={}, style = {'display': '100%'})
-        ], ),
         html.Div( [
             html.Div([
                 html.Label('Unity type:'),
@@ -33,7 +27,7 @@ app.layout = html.Div(id='main', children = [
                     options=[{'label': group, 'value': group} for group in ['Agent', 'NotAgent', 'All']],
                     multi=False,
                     value='All'),
-            ], style = {'width': '25%'}),
+            ], style = {'width': '33%'}),
             html.Div([
                 html.Label('Comment category:'),
                 dcc.Dropdown(id="slct_type",
@@ -41,23 +35,19 @@ app.layout = html.Div(id='main', children = [
                             multi=False,
                             value='Overall',
                             ),
-                    ], style = {'width': '25%'}),
+                    ], style = {'width': '33%'}),
             html.Div([
                 html.Label('Group by:'),
                 dcc.Dropdown(id="slct_group",
                             options=[{'label':group, 'value':group} for group in ['State', 'Unit']],
                             multi=False,
                             value='Unit'),
-                    ], style = {'width': '25%'}),
-            html.Div([
-                html.Label('Show:'),
-                dcc.Dropdown(id="value_type",
-                                options=[{'label':group, 'value':group} for group in ['Rating', 'Sentiment']],
-                                multi=False,
-                                value='Sentiment',
-                                ),
-                    ], style = {'width': '25%'}),
+                    ], style = {'width': '33%'}),
+        
         ], style = { 'display': 'flex'}), 
+        html.Div( [
+            dcc.Graph(id='my_bee_map', figure={}, style = {'display': '100%'})
+        ], ),
         
     ], ) 
 ])
@@ -72,21 +62,13 @@ app.layout = html.Div(id='main', children = [
      Input(component_id='agent_type', component_property='value'),
      Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_group', component_property='value'),
-     Input(component_id='value_type', component_property='value'),
     ]
 )
 
 
-
-
-
- 
-
-    
-
-def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args):
+def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
     slct_type = slct_type.lower()
-    value_type = value_type.lower()
+    value_type = 'sentiment'
     if agent_type == 'Agent':
         agent_type = True 
     elif agent_type == 'NotAgent':
@@ -114,8 +96,12 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
     def by_state(df, slct_type, agent_type, value_type):
 
         if slct_type != 'overall':
-            df[slct_type] = df['text'].apply(lambda x: True if slct_type in x else False)
-            df = df[df[slct_type] == True]
+            if slct_type == 'people':
+                df[slct_type] = df['entities'].apply(lambda x: 'NPH' in x)
+                df = df[df[slct_type] == True]
+            else: 
+                df[slct_type] = df['items'].apply(lambda x: True if slct_type in x else False)
+                df = df[df[slct_type] == True]
 
         
         if agent_type == 'All':
@@ -143,12 +129,10 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
         if agent_type != 'All':
             df_grouped = df_grouped[df_grouped["isAgent"] == agent_type]
         
-        mean_rating = round(df_grouped.rating.mean(), 2)
+        mean_sentiment = round(df_grouped['sentiment.overall'].mean(), 2)
+        norm_mean_sentiment = round(np.array([get_sentiment(v) for v in df_grouped['sentiment.overall']]).mean(), 2)
 
-
-        mean_sentiment = round(np.array([get_sentiment(v) for v in df_grouped['sentiment.overall']]).mean(), 2)
-
-        container = (mean_rating, mean_sentiment)
+        container = (mean_sentiment, norm_mean_sentiment)
         
         if value_type == 'rating':
             color = 'rating'
@@ -168,14 +152,13 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
 
     def by_unit(df, slct_type, agent_type, value_type):
         
-            
-        
         if slct_type != 'overall':
-            df[slct_type] = df['text'].apply(lambda x: True if slct_type in x else False)
-            df = df[df[slct_type] == True]
-
-    
-
+            if slct_type == 'people':
+                df[slct_type] = df['entities'].apply(lambda x: 'NPH' in x)
+                df = df[df[slct_type] == True]
+            else: 
+                df[slct_type] = df['items'].apply(lambda x: True if slct_type in x else False)
+                df = df[df[slct_type] == True]
         
         df_grouped = df\
         .groupby(['place_id', 'place_state', 'place_formatted_address', 'latitude', 'longitude', 'isAgent'], as_index = False)\
@@ -191,16 +174,15 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
     
 
         df_grouped['names'] = df_grouped.entities.apply(get_num_items, args={'NPH'})
-
     
         if agent_type != 'All':
             df_grouped = df_grouped[df_grouped["isAgent"] == agent_type]
             
-        mean_rating = round(df_grouped.rating.mean(), 2)
-        mean_sentiment = round(np.array([get_sentiment(v) for v in df_grouped['sentiment.overall']]).mean(), 2)
+        mean_sentiment = round(df_grouped['sentiment.overall'].mean(), 2)
+        norm_mean_sentiment = round(np.array([get_sentiment(v) for v in df_grouped['sentiment.overall']]).mean(), 2)
 
         
-        container = (mean_rating, mean_sentiment)
+        container = (mean_sentiment, norm_mean_sentiment)
         df_grouped['sentiment'] = df_grouped['sentiment.overall'].apply(get_sentiment)
         
         fig = px.scatter_mapbox(df_grouped, lat="latitude", lon="longitude", color="sentiment", size='rating',
@@ -214,11 +196,6 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
         return container, fig
     
 
-
-
-
-
-        
     df = data_provider.get_data(url_slug)
     
     if slct_group == 'State':
@@ -226,7 +203,7 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, value_type, **args)
     else:
         container, fig = by_unit(df=df, slct_type=slct_type, agent_type=agent_type, value_type=value_type)
     fig.update_layout(
-        title_text = f'{slct_type.capitalize()} by {slct_group}: The mean rating: {container[0]}, mean sentiment: {container[1]}',
+        title_text = f'{slct_type.capitalize()} by {slct_group}:  mean sentiment: {container[0]}, normalized mean sentiment: {container[1]}',
         geo_scope='usa', # limite map scope to USA
     )
     return '', fig

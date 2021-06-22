@@ -36,6 +36,9 @@ class Places(models.Model):
     types = models.JSONField()
     is_agent = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return f'{self.name} ({self.search.text})'
+
 
 class Review(models.Model):
     place = models.ForeignKey(Places, on_delete=models.CASCADE)
@@ -60,14 +63,4 @@ class Review(models.Model):
     expertai_sentiment_items =models.JSONField(null=True, blank=True)
     expertai_topics=models.JSONField(null=True, blank=True)
 
-
-# "place_id";"datetime";"id";"language";"rating";"likes";"reviewer";
-# "url"
-# "sentiment.overall";
-# "text";"reply";"place_name";"place_rating";"place_user_ratings_total";
-# "place_formatted_address";"place_state";"place_types";"place_location";
-# "latitude";"longitude";
-# "expertai_classification";"expertai_entities";"expertai_mainLemmas";
-# "expertai_mainPhrases";"expertai_mainSyncons";"expertai_sentiment.items";
-# "expertai_topics";
 
