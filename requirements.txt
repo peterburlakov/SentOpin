@@ -7,3 +7,4 @@ dpd-static-support
 pandas 
 numpy
 geopandas
+django_admin_listfilter_dropdown
