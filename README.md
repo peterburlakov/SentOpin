@@ -30,6 +30,19 @@ For the demo, we've gathered reviews from all available locations for few compan
 python manage.py runserver
 ```
 
+## How to use 
+
+1. Open: 
+
+http://localhost:8000/admin/reviews/search/ 
+
+2. Use credentials to log in:  
+
+username: `demo`
+
+password: `demo`
+
+
 ## Dev notes 
 
 Apply migrations: 
