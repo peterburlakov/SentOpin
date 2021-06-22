@@ -27,7 +27,7 @@ app.layout = html.Div(id='main', children = [
                     options=[{'label': group, 'value': group} for group in ['Agent', 'NotAgent', 'All']],
                     multi=False,
                     value='All'),
-            ], style = {'width': '33%'}),
+            ], style = {'width': '25%'}),
             html.Div([
                 html.Label('Comment category:'),
                 dcc.Dropdown(id="slct_type",
@@ -35,14 +35,21 @@ app.layout = html.Div(id='main', children = [
                             multi=False,
                             value='Overall',
                             ),
-                    ], style = {'width': '33%'}),
+                    ], style = {'width': '25%'}),
             html.Div([
                 html.Label('Group by:'),
                 dcc.Dropdown(id="slct_group",
                             options=[{'label':group, 'value':group} for group in ['State', 'Unit']],
                             multi=False,
                             value='Unit'),
-                    ], style = {'width': '33%'}),
+                    ], style = {'width': '25%'}),
+            html.Div([
+                html.Label('Classification:'),
+                dcc.Dropdown(id="slct_classification",
+                            options=[{'label':group, 'value':group} for group in ['All', 'Crime', 'Fraud', 'Fire', 'Flood']],
+                            multi=False,
+                            value='All'),
+                    ], style = {'width': '25%'}),
         
         ], style = { 'display': 'flex'}), 
         html.Div( [
@@ -62,11 +69,12 @@ app.layout = html.Div(id='main', children = [
      Input(component_id='agent_type', component_property='value'),
      Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_group', component_property='value'),
+     Input(component_id='slct_classification', component_property='value'),
     ]
 )
 
 
-def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
+def update_graph(url_slug, agent_type, slct_type,slct_group, slct_classification, **args):
     slct_type = slct_type.lower()
     value_type = 'sentiment'
     if agent_type == 'Agent':
@@ -93,7 +101,12 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
             return 4
         return 5
 
-    def by_state(df, slct_type, agent_type, value_type):
+    def by_state(df, slct_type, agent_type, value_type, slct_classification):
+
+        if slct_classification != 'All':
+            df[slct_classification] = df['expertai_classification'].apply(lambda x: slct_classification.lower() in x)
+            df = df[df[slct_classification] == True]
+
 
         if slct_type != 'overall':
             if slct_type == 'people':
@@ -150,8 +163,12 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
         )
         return container, fig
 
-    def by_unit(df, slct_type, agent_type, value_type):
+    def by_unit(df, slct_type, agent_type, value_type, slct_classification):
         
+        if slct_classification != 'All':
+            df[slct_classification] = df['expertai_classification'].apply(lambda x: slct_classification.lower() in x)
+            df = df[df[slct_classification] == True]
+
         if slct_type != 'overall':
             if slct_type == 'people':
                 df[slct_type] = df['entities'].apply(lambda x: 'NPH' in x)
@@ -171,8 +188,6 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
             'expertai_classification':'count'
         })
 
-    
-
         df_grouped['names'] = df_grouped.entities.apply(get_num_items, args={'NPH'})
     
         if agent_type != 'All':
@@ -181,7 +196,6 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
         mean_sentiment = round(df_grouped['sentiment.overall'].mean(), 2)
         norm_mean_sentiment = round(np.array([get_sentiment(v) for v in df_grouped['sentiment.overall']]).mean(), 2)
 
-        
         container = (mean_sentiment, norm_mean_sentiment)
         df_grouped['sentiment'] = df_grouped['sentiment.overall'].apply(get_sentiment)
         
@@ -199,9 +213,9 @@ def update_graph(url_slug, agent_type, slct_type,slct_group, **args):
     df = data_provider.get_data(url_slug)
     
     if slct_group == 'State':
-        container, fig = by_state(df=df, slct_type=slct_type, agent_type=agent_type, value_type=value_type)
+        container, fig = by_state(df=df, slct_type=slct_type, agent_type=agent_type, value_type=value_type, slct_classification=slct_classification)
     else:
-        container, fig = by_unit(df=df, slct_type=slct_type, agent_type=agent_type, value_type=value_type)
+        container, fig = by_unit(df=df, slct_type=slct_type, agent_type=agent_type, value_type=value_type, slct_classification=slct_classification)
     fig.update_layout(
         title_text = f'{slct_type.capitalize()} by {slct_group}:  mean sentiment: {container[0]}, normalized mean sentiment: {container[1]}',
         geo_scope='usa', # limite map scope to USA
