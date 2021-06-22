@@ -1,0 +1,12 @@
+{%load plotly_dash%}
+{% load bootstrap4 %}
+<div class="card border-dark">
+    <div class="card-body">
+        <div class="container">
+            <div class="{%plotly_class name='SimpleExample'%}">
+                <!-- plotly_app -->
+                {%plotly_app name="SimpleExample" ratio=1 initial_arguments=some_dict%}
+            </div>
+        </div>
+    </div>
+</div>
