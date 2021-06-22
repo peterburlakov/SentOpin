@@ -1,12 +1,14 @@
 {%load plotly_dash%}
 {% load bootstrap4 %}
 <div class="card border-dark">
-    <div class="card-body">
+    <div class="card-body" style="height: 700px;">
         <div class="container">
-            <div class="{%plotly_class name='SimpleExample'%}">
+            <div class="{%plotly_class name='SentOpinDash'%}">
                 <!-- plotly_app -->
-                {%plotly_app name="SimpleExample" ratio=1 initial_arguments=some_dict%}
+                {%plotly_app name="SentOpinDash" ratio=1 initial_arguments=some_dict%}
             </div>
         </div>
     </div>
+
+    
 </div>

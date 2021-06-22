@@ -12,10 +12,18 @@ class DataProvider():
 
         reviews = Review.objects.filter(place__search__id=search_id).exclude(text__exact='').select_related('place').select_related()
 
+        def flat_lists(x):
+            if x:
+                items = []
+                for v in x:
+                    items.extend(v)
+                return items
+            return []
+
         data = [{
                 'reviewer': obj.reviewer,
                 'text': obj.text,
-                'entities': obj.expertai_entities,
+                'entities': flat_lists(obj.expertai_entities) ,
                 'items': json.dumps(obj.expertai_sentiment_items).lower(),
                 'phrases': [v[0] for v in obj.expertai_mainPhrases],
                 'lemmas': obj.expertai_mainLemmas,
@@ -25,23 +33,22 @@ class DataProvider():
                 'latitude': float(obj.place.lat),
                 'longitude': float(obj.place.lng),
                 'rating': float(obj.place.rating),
-                'sentiment.overall': float(obj.sentiment_overall)
+                'sentiment.overall': float(obj.sentiment_overall),
+                'place_id': obj.place.id,
+                'place_formatted_address': obj.place.formatted_address
         } 
-
-        for obj in reviews]
+        for obj in reviews 
+        if obj.sentiment_overall and obj.language == 'en']
 
          
 
         df = pd.DataFrame.from_records(data)
-         
+        #df.to_csv('~/Downloads/test.csv')
         
-        # df = pd.read_csv('~/Downloads/reviews.csv', index_col=0)
-        #df['entities'] = df.expertai_entities.apply(lambda x: [i for i in re.sub('[\]\"  \[\,]','', x).split("'") if i!=''])
-        #df['items'] = df['expertai_sentiment.items'].apply(lambda x: [i for i in re.sub('[\]\"  \[\,]','', x).split("'") if i!=''])
-        #df['phrases'] = df['expertai_mainPhrases'].apply(lambda x: [i for i in re.sub('[\]\"\[\,]','', x).split("'") if i!=''])
-        #df['lemmas'] = df['expertai_mainLemmas'].apply(lambda x: [i for i in re.sub('[\]\"\[\,]','', x).split("'") if i!=''])
-        #df['isAgent'] = df.place_name.apply(lambda x: True if 'Agent' in x else False)
 
+
+
+        #print(df.entities)
         states = sorted(np.append(df.place_state.unique().tolist(),'All'))
 
         url = ("https://raw.githubusercontent.com/python-visualization/folium/master/examples/data")
@@ -53,4 +60,4 @@ class DataProvider():
         df = pd.merge(df, geoJSON_df, left_on='place_state', right_on='name')
         
 
-        return df #self.df.copy()
+        return df 
