@@ -16,7 +16,7 @@ class DataProvider():
                 'reviewer': obj.reviewer,
                 'text': obj.text,
                 'entities': obj.expertai_entities,
-                'items': obj.expertai_sentiment_items,
+                'items': json.dumps(obj.expertai_sentiment_items).lower(),
                 'phrases': [v[0] for v in obj.expertai_mainPhrases],
                 'lemmas': obj.expertai_mainLemmas,
                 'isAgent': True if 'Agent' in obj.place.name else False,

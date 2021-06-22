@@ -42,7 +42,6 @@ class SearchAdmin(admin.ModelAdmin):
             f'<a href="/admin/reviews/search/{obj.id}/change/">Show</a> '
         )
   
-
     baton_form_includes = [
         ('dash.html', 'text', 'above', ),
     ]
