@@ -1,9 +1,16 @@
 {%load plotly_dash%}
-
+<a href="/admin/reviews/search">back</a>
 <div class="card border-dark">
-  <div class="card-body">
-    <div class="{%plotly_class name='SimpleExample'%}">
-      {%plotly_app name="SimpleExample" ratio=1 %}
+    <div class="card-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="{%plotly_class name='SimpleExample'%}">
+                        <!-- plotly_app -->
+                        {%plotly_app name="SimpleExample" ratio=1 %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

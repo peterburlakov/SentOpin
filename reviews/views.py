@@ -56,8 +56,6 @@ app.layout = html.Div(id='main', children = [
                     id='value_type',
                     options=[{'label': str(i), 'value': i} for i in ['rating', 'sentiment']],
                     value='sentiment',
-#                     labelClassName='isAgent',
-    #                 labelStyle={'display': 'inline-block'}
                 ),   
         html.Div(id='output_container', children=[]),
         html.Br(),
@@ -128,8 +126,6 @@ def update_graph(agent_type, slct_type, value_type):
     fig = px.scatter_mapbox(df_grouped, lat="latitude", lon="longitude", color=color, size= [12] * len(df_grouped),
             color_continuous_scale=px.colors.sequential.Viridis,
             size_max=40, zoom=2,
-#             text='names',
-#width=800, height=400,
             mapbox_style = 'carto-positron',
             hover_name = 'place_state',
             hover_data=["rating"],
@@ -144,7 +140,7 @@ def update_graph(agent_type, slct_type, value_type):
     return container, fig
 
 
-def show(request):
+def show(request, search_id):
     return render(request, "dash.html")
 
 

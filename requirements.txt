@@ -2,3 +2,6 @@ django
 django-baton
 plotly
 django_plotly_dash
+dash-bootstrap-components
+dpd-static-support
+django-bootstrap4
