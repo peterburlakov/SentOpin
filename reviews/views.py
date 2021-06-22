@@ -25,7 +25,7 @@ app.layout = html.Div(id='main', children = [
     html.Div([
         html.Div( [
             dcc.Graph(id='my_bee_map', figure={}, style = {'display': '100%'})
-        ], ), #style = {'display': '80%'}
+        ], ),
         html.Div( [
             html.Div([
                 html.Label('Unity type:'),
@@ -57,9 +57,9 @@ app.layout = html.Div(id='main', children = [
                                 value='Sentiment',
                                 ),
                     ], style = {'width': '25%'}),
-        ], style = { 'display': 'flex'}), #style = {'display': '20%'} 'display': 'flex',
+        ], style = { 'display': 'flex'}), 
         
-    ], ) # style = {'display': 'flex', 'align-items': 'center', 'width': '100%'}
+    ], ) 
 ])
 
 
