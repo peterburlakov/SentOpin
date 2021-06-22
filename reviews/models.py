@@ -34,6 +34,7 @@ class Places(models.Model):
     user_ratings_total = models.PositiveIntegerField()
     state = models.CharField(max_length=255)
     types = models.JSONField()
+    is_agent = models.BooleanField(default=False)
 
 
 class Review(models.Model):
