@@ -8,3 +8,5 @@ pandas
 numpy
 geopandas
 django_admin_listfilter_dropdown
+expertai-nlapi
+tenacity
