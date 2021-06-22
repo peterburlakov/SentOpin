@@ -126,9 +126,3 @@ def update_graph(url_slug, agent_type, slct_type, value_type):
         
     )
     return container, fig
-
-
-def show(request, search_id):
-    some_dict = {'url_slug': {'children': search_id}}
-    print(some_dict)
-    return render(request, "dash.html", {'some_dict': some_dict})

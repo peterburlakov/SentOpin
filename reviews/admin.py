@@ -39,18 +39,23 @@ class SearchAdmin(admin.ModelAdmin):
     @admin.display(empty_value='???')
     def report(self, obj):
          return format_html(
-            f'<a href="http://localhost:8000/reviews/show/{obj.id}">Show</a> '
+            f'<a href="/admin/reviews/search/{obj.id}/change/">Show</a> '
         )
   
 
     baton_form_includes = [
         ('dash.html', 'text', 'above', ),
     ]
+    
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        some_dict = {'url_slug': {'children': object_id}}
+        extra_context['some_dict'] = some_dict
+        return super(SearchAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
 
-    # def changelist_view(self, request, extra_context=None):
-    #     some_dict = {'url_slug': {'children': 2}}
-    #     extra_context['some_dict'] = some_dict
-    #     return super(SearchAdmin, self).changelist_view(request, extra_context=extra_context)
+     
  
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):

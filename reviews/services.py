@@ -10,8 +10,7 @@ class DataProvider():
 
     def get_data(self, search_id):
 
-        # TODO change search_id
-        reviews = Review.objects.filter(place__search__id=1).exclude(text__exact='').select_related('place').select_related()
+        reviews = Review.objects.filter(place__search__id=search_id).exclude(text__exact='').select_related('place').select_related()
 
         data = [{
                 'reviewer': obj.reviewer,
