@@ -1,15 +1,13 @@
 {%load plotly_dash%}
 {% load bootstrap4 %}
-<a href="/admin/reviews/search">back</a>
 <div class="card border-dark">
     <div class="card-body">
-        
         <div class="container">
-            
             <div class="{%plotly_class name='SimpleExample'%}">
                 <!-- plotly_app -->
-       
-                {%plotly_app name="SimpleExample" ratio=1 initial_arguments=some_dict%}
+                <!-- initial_arguments=some_dict -->
+                
+                {%plotly_app name="SimpleExample" ratio=1 %}
             </div>
         </div>
     </div>

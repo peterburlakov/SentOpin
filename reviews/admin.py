@@ -41,7 +41,16 @@ class SearchAdmin(admin.ModelAdmin):
          return format_html(
             f'<a href="http://localhost:8000/reviews/show/{obj.id}">Show</a> '
         )
+  
 
+    baton_form_includes = [
+        ('dash.html', 'text', 'above', ),
+    ]
+
+    # def changelist_view(self, request, extra_context=None):
+    #     some_dict = {'url_slug': {'children': 2}}
+    #     extra_context['some_dict'] = some_dict
+    #     return super(SearchAdmin, self).changelist_view(request, extra_context=extra_context)
  
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):

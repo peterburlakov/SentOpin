@@ -31,7 +31,7 @@ app.layout = html.Div(id='main', children = [
                 ),    
         html.Div([
             dcc.Dropdown(id="slct_type",
-                         options=[{'label':state, 'value':state} for state in ['service', 'comercial', 'overall', 'people']],
+                         options=[{'label':state, 'value':state} for state in ['service', 'commercial', 'overall', 'people']],
                          multi=False,
                          value='overall',
                          style={'width': "40%"}
@@ -56,7 +56,7 @@ app.layout = html.Div(id='main', children = [
     ],
     [
      Input(component_id='url_slug', component_property='children'),
-    Input(component_id='agent_type', component_property='value'),
+     Input(component_id='agent_type', component_property='value'),
      Input(component_id='slct_type', component_property='value'),
      Input(component_id='value_type', component_property='value')
     ]
@@ -70,7 +70,11 @@ def update_graph(url_slug, agent_type, slct_type, value_type):
 
     df = data_provider.get_data(url_slug)
     if slct_type != 'overall':
+        
         df[slct_type] = df['expertai_classification'].apply(lambda x: True if slct_type in x else False)
+        
+        #df = df[df[slct_type] == True]
+        df[slct_type] = df['text'].apply(lambda x: True if slct_type in x else False)
         df = df[df[slct_type] == True]
     
     if agent_type == 'All':
