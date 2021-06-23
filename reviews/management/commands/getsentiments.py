@@ -10,12 +10,6 @@ from expertai.nlapi.cloud.client import ExpertAiClient
 import os
 
 
-# os.environ["EAI_USERNAME"] = 'peter.burlakov@gmail.com'
-# os.environ["EAI_PASSWORD"] = 'D2tZDl>@psx[GWgA?Lr5x'
-os.environ["EAI_USERNAME"] = 'ihar.nestsiarenia@gmail.com'
-os.environ["EAI_PASSWORD"] = 'NufxZNf!sE4Afe5'
-
-
 class Command(BaseCommand):
     help = 'Collect sentiments'
 
@@ -73,7 +67,8 @@ def save_sentiments(review, sentiment):
 
 def process_sentiments():
     cnt = 0
-    reviews = Review.objects.filter(sentiment_overall=None).exclude(text='')[:500]
+    reviews = Review.objects.filter(
+        sentiment_overall=None).exclude(text='')[:500]
     for r in reviews:
         cnt += 1
         sentiment = expertise(r.text)
@@ -82,12 +77,12 @@ def process_sentiments():
             time.sleep(1)
     return cnt
 
+
 def process_sentiments_all():
-    total=0
+    total = 0
     cnt = process_sentiments()
-    while cnt>0:
-        total+=cnt
+    while cnt > 0:
+        total += cnt
         print('process_sentiments', total)
         cnt = process_sentiments()
     print('process_sentiments', total)
-
